@@ -2,7 +2,9 @@
 
 > ### Live demo → [mm-stellar-smart-account.vercel.app](https://mm-stellar-smart-account.vercel.app/)
 >
-> **Anyone with MetaMask installed in their browser can try this right now.** Open the link, connect your MetaMask, create your own Stellar smart account (admin'd by your Ethereum key), and receive USDC at a real Stellar address. No Freighter wallet to install, no Stellar account to set up, no XLM in your hands. Stellar testnet only.
+> **Monday ready.** ANY MetaMask user can onboard to Stellar today, with less friction than ever before. Built to solve the user-onboarding pain that Ada and the DeFi + Ecosystem teams have been flagging. This is the live working demo, not a roadmap.
+>
+> **Try it right now.** Open the link, connect your MetaMask, create your own Stellar smart account (admin'd by your Ethereum key), interact with it, receive USDC at a real Stellar address. No Freighter wallet to install. No Stellar account to set up. No XLM in your hands. No second seed phrase to back up. Stellar testnet only.
 
 **What if you wanted to give a MetaMask user some assets (USDC) on Stellar? How would you do it?** Today they would have to install Freighter, generate a Stellar keypair, fund it with XLM for the base reserve, set up a USDC trustline, and learn an account model that does not match the one they already use on Ethereum. Most never get past step one. The answer is to create them a smart account on Stellar whose admin signer is the Ethereum key they already have. Their MetaMask becomes the only wallet they touch. The Stellar plumbing (envelope source, XLM fees, on-chain signature verification) lives behind a shared service account and OpenZeppelin's Channels relay, invisible to the user.
 
