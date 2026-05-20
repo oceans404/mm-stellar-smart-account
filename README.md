@@ -1,4 +1,6 @@
-# usdc-mm
+# Onboard MetaMask users to Stellar
+
+*No Freighter to install. No XLM to hold. No second seed phrase. A Stellar smart account whose admin signer is the Ethereum key the user already has.*
 
 > ### Live demo → [mm-stellar-smart-account.vercel.app](https://mm-stellar-smart-account.vercel.app/)
 >
