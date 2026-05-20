@@ -21,7 +21,31 @@ usdc-mm wires this idea into a three-verb demo: Create, Receive, Send. Create as
 
 ---
 
+## Run it
+
+```bash
+npm install
+cp .env.example .env.local   # fill in USDC_MM_SERVICE_SECRET + CHANNELS_API_KEY
+npm run dev                  # localhost:5175
+```
+
+The dev server reads `.env.local` for the two required secrets. The service Stellar secret is used server-side only (signs envelopes for outbound txs). The Channels key is used by the API routes when relaying.
+
+## Deploy to Vercel
+
+1. Push this branch to GitHub.
+2. In Vercel, **Import Project** → pick the repo → set the **production branch** to `nextjs` (or merge `nextjs` into `main` first).
+3. Under **Project Settings → Environment Variables**, add:
+   - `USDC_MM_SERVICE_SECRET` = the shared service Stellar secret (`S...`)
+   - `CHANNELS_API_KEY` = your OpenZeppelin Channels API key
+   - Scope both to all environments (Production, Preview, Development).
+4. Deploy. The API routes (`/api/service-info`, `/api/sign-and-submit`, `/api/channels`) run as Vercel serverless functions and read the env vars at request time. The page bundle ships with no secrets in it.
+
+If `/api/service-info` returns `serviceConfigured: false` after deploy, the env var didn't make it into the build — check the Vercel project settings.
+
+---
+
 Start here:
 - `HANDOFF.md` — orientation for the next agent (architectural choices, on-chain assets, known limitations)
-- `PROGRESS.md` — per-step diary (MM0 through MM4)
-- `web/` — the Vite app (own git repo, port 5175)
+- `PROGRESS.md` — per-step diary (MM0 through MM4, built on the now-removed Vite version on `main`)
+- `SCRIPT.md` — 1-minute hackathon demo script

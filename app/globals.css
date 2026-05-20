@@ -1,0 +1,136 @@
+:root {
+  color-scheme: light dark;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+body {
+  margin: 2rem auto;
+  max-width: 920px;
+  padding: 0 1rem;
+}
+h1 {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem;
+}
+h2 {
+  font-size: 1rem;
+  margin: 1.25rem 0 0.5rem;
+}
+.sub {
+  color: #6b7280;
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+}
+.row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.row .label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  min-width: 9rem;
+}
+button {
+  font: inherit;
+  padding: 0.55rem 1rem;
+  border: 1px solid #6366f1;
+  background: #6366f1;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+button.secondary {
+  background: white;
+  color: #6366f1;
+}
+.badge {
+  font: 0.85rem ui-monospace, monospace;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: #eef2ff;
+  color: #3730a3;
+}
+.badge.warn {
+  background: #fef3c7;
+  color: #92400e;
+}
+.badge.err {
+  background: #fee2e2;
+  color: #991b1b;
+}
+input[type='text'],
+input[type='number'] {
+  font: 12px ui-monospace, monospace;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+input[type='number'] {
+  font: inherit;
+}
+.codebox {
+  font: 12px ui-monospace, SF Mono, Menlo, monospace;
+  background: #f3f4f6;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  color: #6b7280;
+}
+.codebox.set {
+  color: inherit;
+}
+pre.log {
+  font: 12px ui-monospace, SF Mono, Menlo, monospace;
+  background: #0b1020;
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 8px;
+  height: 60vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 1rem;
+}
+.log .tag-mm,
+.log .tag {
+  color: #60a5fa;
+}
+.log .tag-stellar {
+  color: #fbbf24;
+}
+.log .tag-relayer {
+  color: #34d399;
+}
+.log .tag-ui {
+  color: #a78bfa;
+}
+.log .tag-err {
+  color: #fca5a5;
+}
+.log .tag-ok {
+  color: #86efac;
+}
+.log-line {
+  display: block;
+}
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  max-width: 28rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  background: #16a34a;
+  color: white;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+.toast.err {
+  background: #dc2626;
+}
