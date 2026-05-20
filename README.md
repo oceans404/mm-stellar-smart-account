@@ -1,5 +1,9 @@
 # usdc-mm
 
+> ### Live demo → [mm-stellar-smart-account.vercel.app](https://mm-stellar-smart-account.vercel.app/)
+>
+> **Anyone with MetaMask installed in their browser can try this right now.** Open the link, connect your MetaMask, create your own Stellar smart account (admin'd by your Ethereum key), and receive USDC at a real Stellar address. No Freighter wallet to install, no Stellar account to set up, no XLM in your hands. Stellar testnet only.
+
 **What if you wanted to give a MetaMask user some assets (USDC) on Stellar? How would you do it?** Today they would have to install Freighter, generate a Stellar keypair, fund it with XLM for the base reserve, set up a USDC trustline, and learn an account model that does not match the one they already use on Ethereum. Most never get past step one. The answer is to create them a smart account on Stellar whose admin signer is the Ethereum key they already have. Their MetaMask becomes the only wallet they touch. The Stellar plumbing (envelope source, XLM fees, on-chain signature verification) lives behind a shared service account and OpenZeppelin's Channels relay, invisible to the user.
 
 usdc-mm wires this idea into a three-verb demo: Create, Receive, Send. Create asks MetaMask for one signature to bind the user's full public key, then deploys an `eth-vault` smart contract whose admin signer is `External(secp256k1 verifier, pubkey)`. Receive surfaces the resulting Stellar C-address so anyone (a wallet, another smart account, an agent) can send USDC to it via the USDC Stellar Asset Contract. Send produces one MetaMask popup, an EIP-712 typed data envelope that labels the operation, recipient, amount, expiry, and a cryptographic anchor binding the signature to the specific Soroban op. The browser hands the signed authorization to a small relayer that signs the Stellar envelope as the shared service account and submits via Channels. The user never holds a Stellar key, never pays XLM, never installs a Stellar wallet. The only known gap is exchange deposits that require a memo, which Soroban transactions cannot carry today (Stellar CAP-64 is the protocol fix in flight).
@@ -33,13 +37,14 @@ The dev server reads `.env.local` for the two required secrets. The service Stel
 
 ## Deploy to Vercel
 
-1. Push this branch to GitHub.
-2. In Vercel, **Import Project** → pick the repo → set the **production branch** to `nextjs` (or merge `nextjs` into `main` first).
-3. Under **Project Settings → Environment Variables**, add:
+The live build at the top of this README is hosted on Vercel from `main`. To redeploy from scratch:
+
+1. In Vercel, **Add New → Project** and import this repo.
+2. Under **Project Settings → Environment Variables**, add:
    - `USDC_MM_SERVICE_SECRET` = the shared service Stellar secret (`S...`)
    - `CHANNELS_API_KEY` = your OpenZeppelin Channels API key
    - Scope both to all environments (Production, Preview, Development).
-4. Deploy. The API routes (`/api/service-info`, `/api/sign-and-submit`, `/api/channels`) run as Vercel serverless functions and read the env vars at request time. The page bundle ships with no secrets in it.
+3. Deploy. The API routes (`/api/service-info`, `/api/sign-and-submit`, `/api/channels`) run as Vercel serverless functions and read the env vars at request time. The page bundle ships with no secrets in it.
 
 If `/api/service-info` returns `serviceConfigured: false` after deploy, the env var didn't make it into the build — check the Vercel project settings.
 
