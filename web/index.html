@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>usdc-mm — MetaMask smart account on Stellar</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      body { margin: 2rem auto; max-width: 920px; padding: 0 1rem; }
+      h1 { font-size: 1.25rem; margin: 0 0 .5rem; }
+      h2 { font-size: 1rem; margin: 1.25rem 0 .5rem; }
+      .sub { color: #6b7280; margin: 0 0 1.5rem; font-size: .9rem; }
+      .row { display: flex; gap: .75rem; align-items: center; margin-bottom: .75rem; flex-wrap: wrap; }
+      .row .label { font-size: .8rem; color: #6b7280; min-width: 9rem; }
+      button {
+        font: inherit; padding: .55rem 1rem; border: 1px solid #6366f1;
+        background: #6366f1; color: white; border-radius: 6px; cursor: pointer;
+      }
+      button:disabled { opacity: .4; cursor: not-allowed; }
+      button.secondary { background: white; color: #6366f1; }
+      .badge { font: .85rem ui-monospace, monospace; padding: .25rem .5rem; border-radius: 4px; background: #eef2ff; color: #3730a3; }
+      .badge.warn { background: #fef3c7; color: #92400e; }
+      .badge.err  { background: #fee2e2; color: #991b1b; }
+      input[type="text"] {
+        font: 12px ui-monospace, monospace; padding: .5rem;
+        border: 1px solid #d1d5db; border-radius: 6px;
+      }
+      pre.log {
+        font: 12px ui-monospace, SF Mono, Menlo, monospace;
+        background: #0b1020; color: #e5e7eb;
+        padding: 1rem; border-radius: 8px; height: 60vh; overflow: auto;
+        white-space: pre-wrap; word-break: break-word; margin-top: 1rem;
+      }
+      .tag { color: #60a5fa; }
+      .tag-stellar { color: #fbbf24; }
+      .tag-ui { color: #a78bfa; }
+      .err { color: #fca5a5; }
+      .ok  { color: #86efac; }
+
+      .toast {
+        position: fixed; top: 1rem; right: 1rem;
+        max-width: 28rem;
+        padding: .65rem .9rem; border-radius: 8px;
+        background: #16a34a; color: white;
+        font-size: .9rem; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        opacity: 0; transform: translateY(-6px);
+        transition: opacity .25s, transform .25s;
+        z-index: 1000;
+      }
+      .toast.err { background: #dc2626; }
+      .toast.show { opacity: 1; transform: translateY(0); }
+
+      #error-banner {
+        display: none;
+        position: sticky; top: 0;
+        margin: -2rem -1rem 1rem; padding: .65rem 1rem;
+        background: #fee2e2; color: #991b1b;
+        font-size: .9rem; border-bottom: 1px solid #fecaca;
+      }
+      #error-banner.show { display: block; }
+    </style>
+  </head>
+  <body>
+    <div id="error-banner"></div>
+    <h1>usdc-mm — MetaMask smart account on Stellar</h1>
+    <p class="sub">
+      Three verbs: Create your account, Receive USDC, Send USDC. Admin authority lives on your
+      Ethereum key (via MetaMask); a shared service Stellar key pays the envelope fees. Channels
+      covers post-deploy XLM. MM1 (this milestone) wires Connect only — Create / Send are wired
+      in MM2 / MM4.
+    </p>
+
+    <h2>1. Connect</h2>
+    <div class="row">
+      <button id="connect">Connect MetaMask</button>
+      <span class="label">Your wallet (MetaMask):</span>
+      <code id="address" style="font: 12px ui-monospace, SF Mono, Menlo, monospace; background: #f3f4f6; padding: .35rem .5rem; border-radius: 4px; color: #6b7280;">not connected</code>
+      <span id="chain" class="badge">chain: —</span>
+    </div>
+
+    <h2>2. Create your smart account</h2>
+    <p class="sub" style="margin: -.25rem 0 .5rem;">
+      First click triggers a one-time MetaMask <code>personal_sign</code> to bind your public key
+      (we need the full pubkey, not just the address). Then the relayer signs the Stellar envelope
+      as the shared service account and submits via Channels. Resource fee ~0.012 XLM, paid by the
+      service. Per-user cost: zero.
+    </p>
+    <div class="row">
+      <button id="deploy" class="secondary" disabled>Create Account</button>
+    </div>
+    <div class="row">
+      <span class="label">Your smart account:</span>
+      <code id="account" style="font: 12px ui-monospace, SF Mono, Menlo, monospace; background: #f3f4f6; padding: .35rem .5rem; border-radius: 4px; color: #6b7280;">no account yet</code>
+      <button id="copy-account" class="secondary" disabled>Copy</button>
+    </div>
+    <div class="row">
+      <span class="label">Or restore existing:</span>
+      <input id="account-input" type="text" placeholder="C… (paste a previously-created account)" style="width: 26rem;" />
+      <button id="set-account" class="secondary" disabled>Set</button>
+    </div>
+
+    <h2>3. Receive USDC</h2>
+    <p class="sub" style="margin: -.25rem 0 .5rem;">
+      Share this address to receive USDC. Anyone — including another smart account (C-address) or
+      a classic Stellar wallet (G-address via USDC SAC) — can send USDC here.
+    </p>
+    <div class="row">
+      <span class="label">Receive address:</span>
+      <code id="receive-address" style="font: 12px ui-monospace, SF Mono, Menlo, monospace; background: #f3f4f6; padding: .35rem .5rem; border-radius: 4px; color: #6b7280;">create or restore an account first</code>
+      <button id="copy-receive" class="secondary" disabled>Copy</button>
+    </div>
+    <div class="row">
+      <span class="label">Balance:</span>
+      <span id="account-balance" class="badge">—</span>
+      <button id="refresh-balance" class="secondary" disabled>↻ Refresh</button>
+    </div>
+
+    <h2>4. Send USDC</h2>
+    <p class="sub" style="margin: -.25rem 0 .5rem;">
+      Transfers USDC out of your smart account to any recipient — G-address (classic wallet) or C-address
+      (another smart account / contract). One MetaMask popup (EIP-712 typed data showing the labeled
+      operation, recipient, amount); the relayer signs the Stellar envelope and Channels covers the XLM fee.
+    </p>
+    <div class="row" style="gap: 1rem;">
+      <label style="display:flex; flex-direction:column; gap:.2rem; flex:1;">
+        <span style="font-size:.8rem; color:#6b7280;">Recipient (G… or C…)</span>
+        <input id="send-recipient" type="text" placeholder="G… or C…" style="font: 12px ui-monospace, monospace; padding: .5rem; border: 1px solid #d1d5db; border-radius: 6px;" />
+      </label>
+      <label style="display:flex; flex-direction:column; gap:.2rem;">
+        <span style="font-size:.8rem; color:#6b7280;">Amount (USDC)</span>
+        <input id="send-amount" type="number" min="0.0000001" step="0.0000001" value="0.1" style="font: inherit; padding: .4rem; width: 9rem; border: 1px solid #d1d5db; border-radius: 6px;" />
+      </label>
+    </div>
+    <div class="row">
+      <button id="send" disabled>Send</button>
+    </div>
+    <div class="row" style="margin-top: .25rem;">
+      <span id="send-validation" style="font-size:.85rem; color:#991b1b;"></span>
+    </div>
+
+    <pre id="log" class="log"></pre>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
